@@ -1,0 +1,118 @@
+Create a full-stack decentralized application (DApp) named *DrugAuth*. The purpose of this project is to securely track pharmaceutical drug batches through every stage of the supply chain—from manufacturing to production to customer delivery—using Ethereum smart contracts and IPFS for document storage.
+
+The DApp should be built using only free and open-source tools and testnets.
+
+---
+
+🔧 TECH STACK:
+
+- *Frontend*:
+  - React (Vite)
+  - Tailwind CSS for styling
+  - Ethers.js for interacting with smart contracts
+  - MetaMask wallet integration
+  - QR Code generation using any npm package (e.g., qrcode)
+
+- *Smart Contracts*:
+  - Solidity
+  - Hardhat for compiling, testing, and deploying contracts
+  - Deploy contracts to *Goerli Testnet*
+
+- *Off-chain Storage*:
+  - IPFS via *Web3.Storage* (free up to 5GB)
+
+---
+
+📦 PROJECT FEATURES:
+
+1. *Drug Upload*
+   - Form to enter: drug name, manufacturer, batch ID, expiry date
+   - Upload certificate/image (stored in IPFS)
+   - Store IPFS hash and metadata on Ethereum contract
+
+2. *Ownership Tracking*
+   - Track transfer of ownership from manufacturer → producer → distributor → pharmacist → customer
+   - Smart contract must maintain full traceability log for each transfer
+   - Each entity signs a transfer transaction
+
+3. *Verify Drug*
+   - Search drug by batch ID
+   - Fetch and show metadata and IPFS file
+   - Display full transaction history including timestamps and current owner
+
+4. *Security*
+   - Only authorized roles (mock roles: manufacturer, producer, distributor, pharmacist, customer) can add or transfer drugs
+   - Drug data is immutable once added
+
+5. *Extras*
+   - QR code generation to view full trace of drug lifecycle
+   - Use Goerli Faucet ETH for testing
+
+---
+
+📁 FILE STRUCTURE:
+
+
+drug-auth/
+├── frontend/                     # React frontend
+│   ├── src/
+│   │   ├── components/          # Reusable components
+│   │   ├── pages/               # Views/pages
+│   │   ├── App.jsx              # Main app file
+│   │   ├── main.jsx             # Entry point
+│   │   └── utils/               # Ethers config, IPFS, QR
+│   └── tailwind.config.js       # Tailwind CSS config
+│   └── vite.config.js           # Vite config
+│
+├── backend/                     # Hardhat backend
+│   ├── contracts/
+│   │   └── DrugAuth.sol         # Solidity smart contract
+│   ├── scripts/
+│   │   └── deploy.js            # Deployment script
+│   ├── test/
+│   │   └── drugAuth.test.js     # Unit test for contract
+│   └── hardhat.config.js
+│
+├── .env.example                 # Template for environment variables
+├── README.md                    # Documentation
+└── package.json
+
+
+---
+
+📄 README.md MUST INCLUDE:
+
+### Project Overview
+Brief explanation of the project, motivation, and technologies used.
+
+### Prerequisites
+
+
+### Installation Guide
+
+
+
+#### Frontend Setup
+
+
+
+#### Backend (Smart Contracts)
+
+### Environment Variables
+
+
+
+### MetaMask Setup
+
+
+### How to Use
+
+
+### Testing
+
+
+
+### Deployment
+
+
+### Credits & License
