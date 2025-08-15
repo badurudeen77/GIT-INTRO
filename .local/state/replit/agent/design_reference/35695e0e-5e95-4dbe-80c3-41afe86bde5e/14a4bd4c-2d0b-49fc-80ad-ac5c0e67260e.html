@@ -1,0 +1,627 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DrugAuth - Pharmaceutical Supply Chain DApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1976D2',
+                        secondary: '#2E7D32',
+                        accent: '#F57C00',
+                        neutral: '#263238',
+                        surface: '#FFFFFF',
+                        background: '#FAFAFA'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="font-sans bg-background min-h-screen">
+    <!-- @COMPONENT: Header [includes wallet connection and navigation] -->
+    <header class="bg-surface shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-pills text-white text-sm"></i>
+                        </div>
+                        <h1 class="text-xl font-bold text-neutral">DrugAuth</h1>
+                    </div>
+                    <nav class="hidden md:flex space-x-6 ml-8">
+                        <a href="#dashboard" class="text-primary font-medium border-b-2 border-primary pb-1">Dashboard</a>
+                        <a href="#register" class="text-gray-600 hover:text-primary transition-colors">Register Drug</a>
+                        <a href="#verify" class="text-gray-600 hover:text-primary transition-colors">Verify</a>
+                        <a href="#track" class="text-gray-600 hover:text-primary transition-colors">Track Supply Chain</a>
+                    </nav>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- Wallet Connection Status -->
+                    <div class="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-green-50 rounded-lg border border-green-200">
+                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span class="text-sm text-green-700 font-medium" data-bind="wallet.address">0x1234...5678</span>
+                    </div>
+                    
+                    <!-- User Role Badge -->
+                    <div class="px-3 py-1.5 bg-primary/10 rounded-lg">
+                        <span class="text-sm font-medium text-primary" data-bind="user.role">Manufacturer</span>
+                    </div>
+                    
+                    <!-- Network Status -->
+                    <div class="flex items-center space-x-2 px-3 py-1.5 bg-blue-50 rounded-lg border border-blue-200">
+                        <i class="fas fa-network-wired text-blue-600 text-xs"></i>
+                        <span class="text-sm text-blue-700 font-medium">Goerli</span>
+                    </div>
+                    
+                    <!-- Menu Button for Mobile -->
+                    <button class="md:hidden p-2 text-gray-600 hover:text-primary">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: Header -->
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- @COMPONENT: Dashboard Overview [displays key metrics and recent activity] -->
+        <div class="mb-8">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-neutral mb-2">Pharmaceutical Supply Chain Dashboard</h2>
+                    <p class="text-gray-600">Track and verify drug batches across the entire supply chain</p>
+                </div>
+                <div class="mt-4 lg:mt-0">
+                    <button class="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center space-x-2" data-event="click:handleNewDrug">
+                        <i class="fas fa-plus"></i>
+                        <span>Register New Drug</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-surface p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Total Batches</p>
+                            <p class="text-2xl font-bold text-neutral" data-bind="stats.totalBatches">1,247</p>
+                        </div>
+                        <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-box text-primary"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center text-sm">
+                        <span class="text-green-600 font-medium">+12%</span>
+                        <span class="text-gray-600 ml-1">from last month</span>
+                    </div>
+                </div>
+
+                <div class="bg-surface p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Active Transfers</p>
+                            <p class="text-2xl font-bold text-neutral" data-bind="stats.activeTransfers">89</p>
+                        </div>
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-truck text-accent"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center text-sm">
+                        <span class="text-green-600 font-medium">+5%</span>
+                        <span class="text-gray-600 ml-1">from yesterday</span>
+                    </div>
+                </div>
+
+                <div class="bg-surface p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Verified Drugs</p>
+                            <p class="text-2xl font-bold text-neutral" data-bind="stats.verifiedDrugs">1,156</p>
+                        </div>
+                        <div class="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-shield-check text-secondary"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center text-sm">
+                        <span class="text-green-600 font-medium">92.7%</span>
+                        <span class="text-gray-600 ml-1">verification rate</span>
+                    </div>
+                </div>
+
+                <div class="bg-surface p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Gas Used (ETH)</p>
+                            <p class="text-2xl font-bold text-neutral" data-bind="stats.gasUsed">0.0234</p>
+                        </div>
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="fab fa-ethereum text-purple-600"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center text-sm">
+                        <span class="text-gray-600">Last 30 days</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: Dashboard Overview -->
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- @COMPONENT: RecentActivity [displays recent transactions and updates] -->
+            <div class="lg:col-span-2">
+                <div class="bg-surface rounded-xl shadow-sm border border-gray-100 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold text-neutral">Recent Drug Batches</h3>
+                        <div class="flex items-center space-x-2">
+                            <select class="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                <option>All Status</option>
+                                <option>In Transit</option>
+                                <option>Delivered</option>
+                                <option>Expired</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-gray-100">
+                                    <th class="text-left text-sm font-medium text-gray-600 pb-3">Batch ID</th>
+                                    <th class="text-left text-sm font-medium text-gray-600 pb-3">Drug Name</th>
+                                    <th class="text-left text-sm font-medium text-gray-600 pb-3">Current Owner</th>
+                                    <th class="text-left text-sm font-medium text-gray-600 pb-3">Status</th>
+                                    <th class="text-left text-sm font-medium text-gray-600 pb-3">Expiry</th>
+                                    <th class="text-right text-sm font-medium text-gray-600 pb-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                <!-- @MAP: recentBatches.map(batch => ( -->
+                                <tr class="hover:bg-gray-50" data-mock="true">
+                                    <td class="py-4">
+                                        <div class="flex items-center space-x-2">
+                                            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                            <span class="font-mono text-sm text-neutral" data-bind="batch.id">BTC-2024-001</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4">
+                                        <div>
+                                            <p class="font-medium text-neutral" data-bind="batch.drugName">Paracetamol 500mg</p>
+                                            <p class="text-sm text-gray-600" data-bind="batch.manufacturer">PharmaCorp Ltd.</p>
+                                        </div>
+                                    </td>
+                                    <td class="py-4">
+                                        <span class="text-sm text-gray-900" data-bind="batch.currentOwner">Central Distributor</span>
+                                    </td>
+                                    <td class="py-4">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            In Transit
+                                        </span>
+                                    </td>
+                                    <td class="py-4">
+                                        <span class="text-sm text-neutral" data-bind="batch.expiry">Dec 2025</span>
+                                    </td>
+                                    <td class="py-4 text-right">
+                                        <div class="flex items-center justify-end space-x-2">
+                                            <button class="text-primary hover:text-primary/80 text-sm font-medium" data-event="click:viewDetails">
+                                                View
+                                            </button>
+                                            <button class="text-gray-600 hover:text-primary text-sm" data-event="click:generateQR">
+                                                <i class="fas fa-qrcode"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50" data-mock="true">
+                                    <td class="py-4">
+                                        <div class="flex items-center space-x-2">
+                                            <div class="w-2 h-2 bg-amber-500 rounded-full"></div>
+                                            <span class="font-mono text-sm text-neutral" data-bind="batch.id">BTC-2024-002</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4">
+                                        <div>
+                                            <p class="font-medium text-neutral" data-bind="batch.drugName">Amoxicillin 250mg</p>
+                                            <p class="text-sm text-gray-600" data-bind="batch.manufacturer">MedTech Industries</p>
+                                        </div>
+                                    </td>
+                                    <td class="py-4">
+                                        <span class="text-sm text-gray-900" data-bind="batch.currentOwner">Regional Pharmacy</span>
+                                    </td>
+                                    <td class="py-4">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                            Pending
+                                        </span>
+                                    </td>
+                                    <td class="py-4">
+                                        <span class="text-sm text-neutral" data-bind="batch.expiry">Nov 2025</span>
+                                    </td>
+                                    <td class="py-4 text-right">
+                                        <div class="flex items-center justify-end space-x-2">
+                                            <button class="text-primary hover:text-primary/80 text-sm font-medium" data-event="click:viewDetails">
+                                                View
+                                            </button>
+                                            <button class="text-gray-600 hover:text-primary text-sm" data-event="click:generateQR">
+                                                <i class="fas fa-qrcode"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50" data-mock="true">
+                                    <td class="py-4">
+                                        <div class="flex items-center space-x-2">
+                                            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                            <span class="font-mono text-sm text-neutral" data-bind="batch.id">BTC-2024-003</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4">
+                                        <div>
+                                            <p class="font-medium text-neutral" data-bind="batch.drugName">Ibuprofen 400mg</p>
+                                            <p class="text-sm text-gray-600" data-bind="batch.manufacturer">HealthCare Plus</p>
+                                        </div>
+                                    </td>
+                                    <td class="py-4">
+                                        <span class="text-sm text-gray-900" data-bind="batch.currentOwner">Customer</span>
+                                    </td>
+                                    <td class="py-4">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            Delivered
+                                        </span>
+                                    </td>
+                                    <td class="py-4">
+                                        <span class="text-sm text-neutral" data-bind="batch.expiry">Jan 2026</span>
+                                    </td>
+                                    <td class="py-4 text-right">
+                                        <div class="flex items-center justify-end space-x-2">
+                                            <button class="text-primary hover:text-primary/80 text-sm font-medium" data-event="click:viewDetails">
+                                                View
+                                            </button>
+                                            <button class="text-gray-600 hover:text-primary text-sm" data-event="click:generateQR">
+                                                <i class="fas fa-qrcode"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- @END_MAP )) -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-6 flex items-center justify-between">
+                        <p class="text-sm text-gray-600">Showing 1-3 of 1,247 batches</p>
+                        <div class="flex items-center space-x-2">
+                            <button class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50" disabled>
+                                Previous
+                            </button>
+                            <button class="px-3 py-1.5 text-sm bg-primary text-white rounded-lg hover:bg-primary/90">
+                                Next
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: RecentActivity -->
+
+            <!-- @COMPONENT: QuickActions [provides quick access to main functions] -->
+            <div class="space-y-6">
+                <!-- Drug Registration Form -->
+                <div class="bg-surface rounded-xl shadow-sm border border-gray-100 p-6">
+                    <h3 class="text-lg font-semibold text-neutral mb-4 flex items-center space-x-2">
+                        <i class="fas fa-plus-circle text-primary"></i>
+                        <span>Quick Register Drug</span>
+                    </h3>
+                    
+                    <form class="space-y-4" data-event="submit:handleQuickRegister">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Drug Name</label>
+                            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="e.g., Aspirin 100mg" data-bind="form.drugName">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Batch ID</label>
+                            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="e.g., BTC-2024-004" data-bind="form.batchId">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
+                            <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" data-bind="form.expiryDate">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Certificate Upload</label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary/50 transition-colors cursor-pointer" data-implementation="Should handle file upload to IPFS">
+                                <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
+                                <p class="text-sm text-gray-600">Click to upload or drag and drop</p>
+                                <p class="text-xs text-gray-400">PDF, PNG, JPG up to 10MB</p>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-primary text-white py-2.5 rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center justify-center space-x-2">
+                            <i class="fas fa-plus"></i>
+                            <span>Register Drug</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Drug Verification -->
+                <div class="bg-surface rounded-xl shadow-sm border border-gray-100 p-6">
+                    <h3 class="text-lg font-semibold text-neutral mb-4 flex items-center space-x-2">
+                        <i class="fas fa-search text-secondary"></i>
+                        <span>Verify Drug</span>
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Batch ID or QR Code</label>
+                            <div class="flex space-x-2">
+                                <input type="text" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Enter batch ID" data-bind="verify.batchId">
+                                <button class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50" data-event="click:scanQR" title="Scan QR Code">
+                                    <i class="fas fa-qrcode"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full bg-secondary text-white py-2.5 rounded-lg font-medium hover:bg-secondary/90 transition-colors flex items-center justify-center space-x-2" data-event="click:verifyDrug">
+                            <i class="fas fa-shield-check"></i>
+                            <span>Verify Drug</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Verification Result (shown conditionally) -->
+                    <div class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg" data-mock="true" style="display: none;" data-implementation="Show when verification is successful">
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-check-circle text-green-600 mt-0.5"></i>
+                            <div>
+                                <p class="font-medium text-green-800">Drug Verified ✓</p>
+                                <p class="text-sm text-green-700 mt-1">This drug is authentic and traceable in our system.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Supply Chain Status -->
+                <div class="bg-surface rounded-xl shadow-sm border border-gray-100 p-6">
+                    <h3 class="text-lg font-semibold text-neutral mb-4 flex items-center space-x-2">
+                        <i class="fas fa-route text-accent"></i>
+                        <span>Supply Chain Status</span>
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <!-- Supply Chain Timeline -->
+                        <div class="relative">
+                            <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                            
+                            <div class="relative flex items-center space-x-4 pb-4">
+                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center relative z-10">
+                                    <i class="fas fa-industry text-white text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-neutral">Manufacturing</p>
+                                    <p class="text-sm text-gray-600">Completed</p>
+                                </div>
+                            </div>
+                            
+                            <div class="relative flex items-center space-x-4 pb-4">
+                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center relative z-10">
+                                    <i class="fas fa-cogs text-white text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-neutral">Production</p>
+                                    <p class="text-sm text-gray-600">Completed</p>
+                                </div>
+                            </div>
+                            
+                            <div class="relative flex items-center space-x-4 pb-4">
+                                <div class="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center relative z-10">
+                                    <i class="fas fa-truck text-white text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-neutral">Distribution</p>
+                                    <p class="text-sm text-amber-600">In Progress</p>
+                                </div>
+                            </div>
+                            
+                            <div class="relative flex items-center space-x-4 pb-4">
+                                <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center relative z-10">
+                                    <i class="fas fa-store text-gray-600 text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-600">Pharmacy</p>
+                                    <p class="text-sm text-gray-500">Pending</p>
+                                </div>
+                            </div>
+                            
+                            <div class="relative flex items-center space-x-4">
+                                <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center relative z-10">
+                                    <i class="fas fa-user text-gray-600 text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-600">Customer</p>
+                                    <p class="text-sm text-gray-500">Pending</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: QuickActions -->
+        </div>
+
+        <!-- @COMPONENT: DetailedDrugView [modal for viewing complete drug information] -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" style="display: none;" data-implementation="Show when viewing drug details">
+            <div class="bg-surface rounded-xl shadow-xl max-w-4xl w-full max-h-screen overflow-y-auto">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-bold text-neutral">Drug Batch Details</h2>
+                        <button class="text-gray-400 hover:text-gray-600" data-event="click:closeModal">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Drug Information -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-neutral mb-4">Drug Information</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-600">Batch ID</label>
+                                    <p class="font-mono text-neutral" data-bind="selectedDrug.batchId">BTC-2024-001</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-600">Drug Name</label>
+                                    <p class="text-neutral" data-bind="selectedDrug.name">Paracetamol 500mg</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-600">Manufacturer</label>
+                                    <p class="text-neutral" data-bind="selectedDrug.manufacturer">PharmaCorp Ltd.</p>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-600">Manufacturing Date</label>
+                                        <p class="text-neutral" data-bind="selectedDrug.mfgDate">Jan 15, 2024</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-600">Expiry Date</label>
+                                        <p class="text-neutral" data-bind="selectedDrug.expiry">Dec 15, 2025</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- QR Code -->
+                            <div class="mt-6 p-4 border border-gray-200 rounded-lg text-center">
+                                <h4 class="font-medium text-neutral mb-3">QR Code</h4>
+                                <div class="w-32 h-32 bg-gray-100 rounded-lg mx-auto flex items-center justify-center" data-implementation="Generate QR code here">
+                                    <i class="fas fa-qrcode text-4xl text-gray-400"></i>
+                                </div>
+                                <button class="mt-3 text-sm text-primary hover:text-primary/80 font-medium" data-event="click:downloadQR">
+                                    Download QR Code
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Supply Chain History -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-neutral mb-4">Supply Chain History</h3>
+                            <div class="space-y-4">
+                                <!-- @MAP: drugHistory.map(entry => ( -->
+                                <div class="border border-gray-200 rounded-lg p-4" data-mock="true">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mt-1">
+                                            <i class="fas fa-industry text-white text-xs"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between">
+                                                <p class="font-medium text-neutral" data-bind="entry.stage">Manufacturing</p>
+                                                <span class="text-sm text-gray-600" data-bind="entry.date">Jan 15, 2024</span>
+                                            </div>
+                                            <p class="text-sm text-gray-600 mt-1" data-bind="entry.owner">PharmaCorp Ltd.</p>
+                                            <p class="text-sm text-gray-500 mt-1" data-bind="entry.transactionHash">Tx: 0x1234...5678</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="border border-gray-200 rounded-lg p-4" data-mock="true">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center mt-1">
+                                            <i class="fas fa-truck text-white text-xs"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between">
+                                                <p class="font-medium text-neutral" data-bind="entry.stage">Distribution</p>
+                                                <span class="text-sm text-gray-600" data-bind="entry.date">Jan 20, 2024</span>
+                                            </div>
+                                            <p class="text-sm text-gray-600 mt-1" data-bind="entry.owner">Central Distributor</p>
+                                            <p class="text-sm text-gray-500 mt-1" data-bind="entry.transactionHash">Tx: 0x5678...9abc</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- @END_MAP )) -->
+                            </div>
+                            
+                            <!-- IPFS Certificate Link -->
+                            <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                <h4 class="font-medium text-blue-900 mb-2">Certificate & Documents</h4>
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-file-alt text-blue-600"></i>
+                                    <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium" data-bind="selectedDrug.ipfsHash" data-event="click:viewCertificate">
+                                        View Certificate (IPFS)
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: DetailedDrugView -->
+    </div>
+
+    <!-- @COMPONENT: Footer [contains additional links and info] -->
+    <footer class="bg-surface border-t border-gray-200 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-pills text-white text-sm"></i>
+                        </div>
+                        <h3 class="font-bold text-neutral">DrugAuth</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm">Secure pharmaceutical supply chain tracking powered by Ethereum and IPFS.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-neutral mb-4">Smart Contract</h4>
+                    <div class="space-y-2 text-sm">
+                        <p class="text-gray-600">Network: Goerli Testnet</p>
+                        <p class="text-gray-600 font-mono">Contract: 0x1234...5678</p>
+                        <a href="#" class="text-primary hover:text-primary/80">View on Etherscan</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-neutral mb-4">Resources</h4>
+                    <div class="space-y-2 text-sm">
+                        <a href="#" class="block text-gray-600 hover:text-primary">Documentation</a>
+                        <a href="#" class="block text-gray-600 hover:text-primary">API Reference</a>
+                        <a href="#" class="block text-gray-600 hover:text-primary">GitHub Repository</a>
+                        <a href="#" class="block text-gray-600 hover:text-primary">Get Goerli ETH</a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 mt-8 pt-8 text-center">
+                <p class="text-sm text-gray-600">Built with React, Solidity, Hardhat & IPFS | Open Source</p>
+            </div>
+        </div>
+    </footer>
+    <!-- @END_COMPONENT: Footer -->
+
+    <script>
+        (function() {
+            // TODO: Implement MetaMask connection
+            // TODO: Implement smart contract interactions with Ethers.js
+            // TODO: Implement IPFS file upload via Web3.Storage
+            // TODO: Implement QR code generation
+            // TODO: Implement form validations and error handling
+            // TODO: Implement responsive mobile menu
+            // TODO: Implement modal state management
+            // TODO: Implement table sorting and filtering
+            // TODO: Implement real-time updates via blockchain events
+            
+            // Mock interactive functionality for demonstration
+            console.log('DrugAuth DApp Interface Loaded');
+            console.log('Ready for React component integration');
+        })();
+    </script>
+</body>
+</html>
